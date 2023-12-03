@@ -2,8 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MusicalInformationPanel extends JPanel {
-    private JList<Musical> musicalList;
     private static DefaultListModel<Musical> musicalListModel;
+    private JList<Musical> musicalList;
 
     public MusicalInformationPanel() {
         setLayout(new BorderLayout());
@@ -11,22 +11,28 @@ public class MusicalInformationPanel extends JPanel {
         musicalList = new JList<>(musicalListModel);
         musicalList.setCellRenderer(new MusicalCellRenderer());
         populateMusicals();
-        add(new JScrollPane(musicalList), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(musicalList);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private void populateMusicals() {
         musicalListModel.addElement(new Musical("The Lion King", "2h 30m (incl. interval)",
                 "Disney Shows, Family and Kids, Last Minute Tickets", "Lyceum Theatre",
-                "6+ Children Under 3 are not permitted to enter the theatre"));
+                "6+ Children Under 3 are not permitted to enter the theatre", "lion-king.jpg"));
 
         musicalListModel.addElement(new Musical("Les Misérables", "3h (incl. interval)", "Drama, Musicals",
-                "Queen's Theatre", "8+"));
+                "Queen's Theatre", "8+", "Les_Misérables.jpg"));
 
         musicalListModel.addElement(new Musical("Wicked", "2h 45m (incl. interval)", "Musicals",
-                "Apollo Victoria Theatre", "5+"));
+                "Apollo Victoria Theatre", "5+", "wicked.jpg"));
     }
 
     private static class MusicalCellRenderer extends JPanel implements ListCellRenderer<Musical> {
+        private JLabel imageLabel;
+        private JPanel detailsPanel; // Added a panel for details to allow spacing
+
         private JLabel nameLabel;
         private JLabel runTimeLabel;
         private JLabel categoriesLabel;
@@ -34,37 +40,55 @@ public class MusicalInformationPanel extends JPanel {
         private JLabel ageLabel;
 
         public MusicalCellRenderer() {
-            setLayout(new GridLayout(5, 1));
-            nameLabel = new JLabel();
-            runTimeLabel = new JLabel();
-            categoriesLabel = new JLabel();
-            venueLabel = new JLabel();
-            ageLabel = new JLabel();
+            setLayout(new BorderLayout());
+            setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            setBackground(Color.WHITE);
 
-            add(nameLabel);
-            add(runTimeLabel);
-            add(categoriesLabel);
-            add(venueLabel);
-            add(ageLabel);
+            imageLabel = new JLabel();
+            imageLabel.setHorizontalAlignment(JLabel.CENTER);
+            add(imageLabel, BorderLayout.WEST);
+
+            detailsPanel = new JPanel(new GridLayout(5, 1));
+            detailsPanel.setBackground(Color.WHITE);
+
+            nameLabel = createLabel();
+            runTimeLabel = createLabel();
+            categoriesLabel = createLabel();
+            venueLabel = createLabel();
+            ageLabel = createLabel();
+
+            detailsPanel.add(nameLabel);
+            detailsPanel.add(runTimeLabel);
+            detailsPanel.add(categoriesLabel);
+            detailsPanel.add(venueLabel);
+            detailsPanel.add(ageLabel);
+            // add a gap between the image and details
+            detailsPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+
+            add(detailsPanel, BorderLayout.CENTER);
+        }
+
+        private JLabel createLabel() {
+            JLabel label = new JLabel();
+            label.setForeground(Color.DARK_GRAY);
+            return label;
         }
 
         @Override
         public Component getListCellRendererComponent(JList<? extends Musical> list, Musical value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
-            if (value.name.isEmpty()) {
-                setPreferredSize(new Dimension(0, 10));
-                setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-                return this;
-            }
+                boolean isSelected, boolean cellHasFocus) {
+            ImageIcon icon = new ImageIcon(getClass().getResource(value.imagePath));
+            // Set the preferred size of the imageLabel
+            imageLabel.setIcon(new ImageIcon(icon.getImage().getScaledInstance(250, 150, Image.SCALE_SMOOTH)));
 
-            nameLabel.setText(value.name);
-            runTimeLabel.setText("Run Time: " + value.runTime);
-            categoriesLabel.setText("Categories: " + value.categories);
-            venueLabel.setText("Venue: " + value.venue);
-            ageLabel.setText("Age: " + value.age);
+            nameLabel.setText("<html><h2>" + value.name + "</h2></html>");
+            runTimeLabel.setText("<html><i>Run Time:</i> " + value.runTime + "</html>");
+            categoriesLabel.setText("<html><b>Categories:</b> " + value.categories + "</html>");
+            venueLabel.setText("<html><b>Venue:</b> " + value.venue + "</html>");
+            ageLabel.setText("<html><b>Age:</b> " + value.age + "</html>");
 
-            setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
-            setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+            setBackground(isSelected ? list.getSelectionBackground() : Color.WHITE);
+            setForeground(isSelected ? list.getSelectionForeground() : Color.DARK_GRAY);
             return this;
         }
     }
@@ -75,13 +99,15 @@ public class MusicalInformationPanel extends JPanel {
         private String categories;
         private String venue;
         private String age;
+        private String imagePath;
 
-        public Musical(String name, String runTime, String categories, String venue, String age) {
+        public Musical(String name, String runTime, String categories, String venue, String age, String imagePath) {
             this.name = name;
             this.runTime = runTime;
             this.categories = categories;
             this.venue = venue;
             this.age = age;
+            this.imagePath = imagePath;
         }
 
         @Override
@@ -89,5 +115,25 @@ public class MusicalInformationPanel extends JPanel {
             return String.format("%d. %s\nRun Time: %s\nCategories: %s\nVenue: %s\nAge: %s",
                     musicalListModel.size() + 1, name, runTime, categories, venue, age);
         }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                e.printStackTrace();
+            }
+
+            JFrame frame = new JFrame("Musical Information");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(600, 400);
+
+            MusicalInformationPanel musicalInformationPanel = new MusicalInformationPanel();
+            frame.add(musicalInformationPanel);
+
+            frame.setVisible(true);
+        });
     }
 }

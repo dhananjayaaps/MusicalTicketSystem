@@ -6,16 +6,17 @@ import java.awt.event.ActionListener;
 public class BookTicketPanel extends JPanel {
     private JSpinner numberOfTicketsSpinner;
     private JRadioButton adultRadio, seniorRadio, studentRadio;
-    private JList<String> selectedSeatsList;
+    private JToggleButton[][] seatButtons; // 2D array to store seat buttons
     private JTextField totalPriceField;
     private JButton bookTicketButtonInPanel;
 
     public BookTicketPanel() {
         setLayout(new GridBagLayout());
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding to the whole panel
         GridBagConstraints gbc = new GridBagConstraints();
 
         // Set vertical and horizontal gaps between grids
-        gbc.insets = new Insets(20, 10, 10, 5); // 5 pixels of padding on all sides
+        gbc.insets = new Insets(10, 5, 10, 5); // 5 pixels of padding on all sides
 
         // Number of Tickets
         gbc.gridx = 0;
@@ -39,6 +40,7 @@ public class BookTicketPanel extends JPanel {
         add(new JLabel("Ticket Type:"), gbc);
 
         JPanel ticketTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        ticketTypePanel.setBorder(BorderFactory.createTitledBorder("Select Type"));
         adultRadio = new JRadioButton("Adult");
         seniorRadio = new JRadioButton("Senior");
         studentRadio = new JRadioButton("Student");
@@ -63,8 +65,8 @@ public class BookTicketPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        selectedSeatsList = new JList<>(new String[]{"Seat 1", "Seat 2"});
-        add(new JScrollPane(selectedSeatsList), gbc);
+        JPanel seatSelectionPanel = createSeatSelectionPanel(5, 5); // Specify the number of rows and columns
+        add(seatSelectionPanel, gbc);
 
         // Total Price
         gbc.gridx = 0;
@@ -76,6 +78,7 @@ public class BookTicketPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST; // Align to the left
         totalPriceField = new JTextField(10);
         totalPriceField.setEditable(false); // Set the field to uneditable
+        totalPriceField.setBackground(Color.LIGHT_GRAY); // Add a background color
         add(totalPriceField, gbc);
 
         // Book Ticket Button
@@ -84,6 +87,8 @@ public class BookTicketPanel extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST; // Align to the left
         bookTicketButtonInPanel = new JButton("Book Ticket");
+        bookTicketButtonInPanel.setBackground(new Color(30, 144, 255)); // Use a custom color
+        bookTicketButtonInPanel.setForeground(Color.WHITE); // Set text color to white
         add(bookTicketButtonInPanel, gbc);
 
         // Action listener for the "Book Ticket" button
@@ -109,12 +114,27 @@ public class BookTicketPanel extends JPanel {
         });
     }
 
+    // Create a panel with a grid of toggle buttons for seat selection
+    private JPanel createSeatSelectionPanel(int rows, int columns) {
+        JPanel seatPanel = new JPanel(new GridLayout(rows, columns, 5, 5)); // Specify the gaps between grids
+        seatButtons = new JToggleButton[rows][columns];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                seatButtons[i][j] = new JToggleButton(String.format("Seat %d-%d", i + 1, j + 1));
+                seatPanel.add(seatButtons[i][j]);
+            }
+        }
+
+        return seatPanel;
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame();
+            JFrame frame = new JFrame("Book Ticket Panel Test");
+            frame.setSize(400, 400);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.getContentPane().add(new BookTicketPanel());
-            frame.pack();
+            frame.add(new BookTicketPanel());
             frame.setVisible(true);
         });
     }
