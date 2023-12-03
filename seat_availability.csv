@@ -1,0 +1,13 @@
+Musical,Time,Date,Venue,SeatRow,SeatColumn,IsAvailable
+Musical1,Evening,2023-01-01,Venue1,1,1,true
+Musical1,Evening,2023-01-01,Venue1,1,2,true
+Musical1,Evening,2023-01-01,Venue1,1,3,true
+Musical1,Evening,2023-01-01,Venue1,2,1,true
+Musical1,Evening,2023-01-01,Venue1,2,2,false
+Musical1,Evening,2023-01-01,Venue1,2,3,true
+Musical1,Evening,2023-01-01,Venue1,3,1,true
+Musical1,Evening,2023-01-01,Venue1,3,2,true
+Musical1,Evening,2023-01-01,Venue1,3,3,true
+Musical2,Evening,2023-01-01,Venue1,1,1,false
+Musical2,Evening,2023-01-01,Venue1,2,1,true
+Musical2,Evening,2023-01-01,Venue1,3,1,true

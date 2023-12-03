@@ -25,14 +25,15 @@ public class ShowSchedulePanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Dropdown for selecting day of the week
-        dayOfWeekDropdown = new JComboBox<>(new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"});
+        dayOfWeekDropdown = new JComboBox<>(
+                new String[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
 
         // Dropdown for selecting show
-        showDropdown = new JComboBox<>(new String[]{"The Lion King", "Wicked"});
+        showDropdown = new JComboBox<>(new String[] { "The Lion King", "Wicked" });
         showSchedules = loadShowSchedules();
 
         // Table for displaying show schedule
-        String[] columnNames = {"Day of week", "Matinee", "Evening"};
+        String[] columnNames = { "Day of week", "Matinee", "Evening" };
         Object[][] data = getSelectedShowSchedule(); // Initial data for the selected show
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
@@ -107,7 +108,7 @@ public class ShowSchedulePanel extends JPanel {
     private void updateScheduleTable() {
         Object[][] data = getSelectedShowSchedule();
         DefaultTableModel tableModel = (DefaultTableModel) scheduleTable.getModel();
-        tableModel.setDataVector(data, new String[]{"Day of week", "Matinee", "Evening"});
+        tableModel.setDataVector(data, new String[] { "Day of week", "Matinee", "Evening" });
     }
 
     private Object[][] getSelectedShowSchedule() {
@@ -129,7 +130,8 @@ public class ShowSchedulePanel extends JPanel {
     }
 
     private String getAvailableSeats(String matinee, String evening) {
-        // Replace this with logic to fetch available seats based on the selected schedule
+        // Replace this with logic to fetch available seats based on the selected
+        // schedule
         // For demonstration purposes, this returns a placeholder string
         return "100";
     }
