@@ -1,5 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class MusicalInformationPanel extends JPanel {
     private static DefaultListModel<Musical> musicalListModel;
@@ -10,28 +15,32 @@ public class MusicalInformationPanel extends JPanel {
         musicalListModel = new DefaultListModel<>();
         musicalList = new JList<>(musicalListModel);
         musicalList.setCellRenderer(new MusicalCellRenderer());
-        populateMusicals();
+        populateMusicalsFromCSV("musicals.csv"); // Change the filename accordingly
 
         JScrollPane scrollPane = new JScrollPane(musicalList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void populateMusicals() {
-        musicalListModel.addElement(new Musical("The Lion King", "2h 30m (incl. interval)",
-                "Disney Shows, Family and Kids, Last Minute Tickets", "Lyceum Theatre",
-                "6+ Children Under 3 are not permitted to enter the theatre", "lion-king.jpg"));
+    private void populateMusicalsFromCSV(String fileName) {
+        try {
+            Path path = Paths.get(fileName);
+            List<String> lines = Files.readAllLines(path);
 
-        musicalListModel.addElement(new Musical("Les Misérables", "3h (incl. interval)", "Drama, Musicals",
-                "Queen's Theatre", "8+", "Les_Misérables.jpg"));
-
-        musicalListModel.addElement(new Musical("Wicked", "2h 45m (incl. interval)", "Musicals",
-                "Apollo Victoria Theatre", "5+", "wicked.jpg"));
+            for (String line : lines) {
+                String[] parts = line.split(",");
+                if (parts.length == 6) {
+                    musicalListModel.addElement(new Musical(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static class MusicalCellRenderer extends JPanel implements ListCellRenderer<Musical> {
         private JLabel imageLabel;
-        private JPanel detailsPanel; // Added a panel for details to allow spacing
+        private JPanel detailsPanel;
 
         private JLabel nameLabel;
         private JLabel runTimeLabel;
@@ -62,7 +71,7 @@ public class MusicalInformationPanel extends JPanel {
             detailsPanel.add(categoriesLabel);
             detailsPanel.add(venueLabel);
             detailsPanel.add(ageLabel);
-            // add a gap between the image and details
+
             detailsPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
 
             add(detailsPanel, BorderLayout.CENTER);
@@ -76,9 +85,8 @@ public class MusicalInformationPanel extends JPanel {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends Musical> list, Musical value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+                                                      boolean isSelected, boolean cellHasFocus) {
             ImageIcon icon = new ImageIcon(getClass().getResource(value.imagePath));
-            // Set the preferred size of the imageLabel
             imageLabel.setIcon(new ImageIcon(icon.getImage().getScaledInstance(250, 150, Image.SCALE_SMOOTH)));
 
             nameLabel.setText("<html><h2>" + value.name + "</h2></html>");

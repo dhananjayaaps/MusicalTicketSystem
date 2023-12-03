@@ -90,6 +90,7 @@ public class BookTicketPanel extends JPanel {
         bookTicketButtonInPanel.setBackground(new Color(30, 144, 255)); // Use a custom color
         bookTicketButtonInPanel.setForeground(Color.WHITE); // Set text color to white
         add(bookTicketButtonInPanel, gbc);
+        
 
         // Action listener for the "Book Ticket" button
         bookTicketButtonInPanel.addActionListener(new ActionListener() {

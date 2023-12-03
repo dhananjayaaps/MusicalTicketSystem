@@ -4,30 +4,36 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ShowSchedulePanel extends JPanel {
     private JComboBox<String> dayOfWeekDropdown;
+    private JComboBox<String> showDropdown;
     private JTable scheduleTable;
     private JButton updateSeatsButton;
     private JLabel availableSeatsLabel;
 
+    private Map<String, ShowSchedule> showSchedules;
+
     public ShowSchedulePanel() {
         setLayout(new BorderLayout());
 
-        // Dropdown for selecting day of week
+        // Dropdown for selecting day of the week
         dayOfWeekDropdown = new JComboBox<>(new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"});
+
+        // Dropdown for selecting show
+        showDropdown = new JComboBox<>(new String[]{"The Lion King", "Wicked"});
+        showSchedules = loadShowSchedules();
 
         // Table for displaying show schedule
         String[] columnNames = {"Day of week", "Matinee", "Evening"};
-        Object[][] data = {
-                {"Monday", "-", "-"},
-                {"Tuesday", "-", "-"},
-                {"Wednesday", "-", "7:00 pm"},
-                {"Thursday", "2:00 pm", "7:00 pm"},
-                {"Friday", "-", "7:00 pm"},
-                {"Saturday", "2:30 pm", "7:00 pm"},
-                {"Sunday", "1:00 pm", "5:30 pm"}
-        };
+        Object[][] data = getSelectedShowSchedule(); // Initial data for the selected show
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -72,11 +78,45 @@ public class ShowSchedulePanel extends JPanel {
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Select Day of Week:"));
         topPanel.add(dayOfWeekDropdown);
+        topPanel.add(new JLabel("Select Show:"));
+        topPanel.add(showDropdown);
         topPanel.add(updateSeatsButton);
 
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
         add(availableSeatsLabel, BorderLayout.SOUTH);
+
+        // Add listener for show dropdown changes
+        showDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateScheduleTable();
+            }
+        });
+    }
+
+    private Map<String, ShowSchedule> loadShowSchedules() {
+        // Load show schedules from CSV file (replace with actual logic)
+        // For this example, we load schedules for two shows
+        Map<String, ShowSchedule> schedules = new HashMap<>();
+        schedules.put("The Lion King", new ShowSchedule("The Lion King", "schedule.csv"));
+        schedules.put("Wicked", new ShowSchedule("Wicked", "schedule.csv"));
+        return schedules;
+    }
+
+    private void updateScheduleTable() {
+        Object[][] data = getSelectedShowSchedule();
+        DefaultTableModel tableModel = (DefaultTableModel) scheduleTable.getModel();
+        tableModel.setDataVector(data, new String[]{"Day of week", "Matinee", "Evening"});
+    }
+
+    private Object[][] getSelectedShowSchedule() {
+        String selectedShow = (String) showDropdown.getSelectedItem();
+        ShowSchedule showSchedule = showSchedules.get(selectedShow);
+        if (showSchedule != null) {
+            return showSchedule.getSchedule();
+        }
+        return new Object[0][0];
     }
 
     private int getRowIndex(String dayOfWeek) {
@@ -92,5 +132,64 @@ public class ShowSchedulePanel extends JPanel {
         // Replace this with logic to fetch available seats based on the selected schedule
         // For demonstration purposes, this returns a placeholder string
         return "100";
+    }
+
+    private static class ShowSchedule {
+        private String showName;
+        private String scheduleFileName;
+
+        public ShowSchedule(String showName, String scheduleFileName) {
+            this.showName = showName;
+            this.scheduleFileName = scheduleFileName;
+        }
+
+        public String getShowName() {
+            return showName;
+        }
+
+        public Object[][] getSchedule() {
+            return readScheduleFromCSV(scheduleFileName);
+        }
+
+        private Object[][] readScheduleFromCSV(String fileName) {
+            try {
+                Path path = Paths.get(fileName);
+                List<String> lines = Files.readAllLines(path);
+
+                Object[][] data = new Object[lines.size()][lines.get(0).split(",").length];
+
+                for (int i = 0; i < lines.size(); i++) {
+                    String[] parts = lines.get(i).split(",");
+                    for (int j = 0; j < parts.length; j++) {
+                        data[i][j] = parts[j].equals("-") ? "" : parts[j];
+                    }
+                }
+
+                return data;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return new Object[0][0];
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                e.printStackTrace();
+            }
+
+            JFrame frame = new JFrame("Show Schedule Information");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(600, 400);
+
+            ShowSchedulePanel showSchedulePanel = new ShowSchedulePanel();
+            frame.add(showSchedulePanel);
+
+            frame.setVisible(true);
+        });
     }
 }
