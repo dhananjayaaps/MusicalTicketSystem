@@ -1,25 +1,64 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class MusicalInformationPanel extends JPanel {
     private static DefaultListModel<Musical> musicalListModel;
     private JList<Musical> musicalList;
+    private JTextField searchField;
 
     public MusicalInformationPanel() {
         setLayout(new BorderLayout());
+
         musicalListModel = new DefaultListModel<>();
         musicalList = new JList<>(musicalListModel);
         musicalList.setCellRenderer(new MusicalCellRenderer());
-        populateMusicalsFromCSV("musicals.csv"); // Change the filename accordingly
 
         JScrollPane scrollPane = new JScrollPane(musicalList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
+
+        // Add search bar
+        searchField = new JTextField();
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterMusicals(searchField.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterMusicals(searchField.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Plain text components do not fire these events
+            }
+        });
+
+        add(searchField, BorderLayout.NORTH);
+
+        populateMusicalsFromCSV("musicals.csv"); // Change the filename accordingly
+    }
+
+    private void filterMusicals(String searchText) {
+        DefaultListModel<Musical> filteredModel = new DefaultListModel<>();
+        for (int i = 0; i < musicalListModel.getSize(); i++) {
+            Musical musical = musicalListModel.getElementAt(i);
+            if (musical.name.toLowerCase().contains(searchText.toLowerCase())) {
+                filteredModel.addElement(musical);
+            }
+        }
+        musicalList.setModel(filteredModel);
     }
 
     private void populateMusicalsFromCSV(String fileName) {

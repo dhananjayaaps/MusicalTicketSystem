@@ -1,10 +1,9 @@
-import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
+import javax.sound.sampled.*;
 
 public class LondonMusicalTicketSystemGUI extends JFrame {
     private JPanel buttonPanel;
@@ -20,7 +19,7 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
     private ShowSchedulePanel showSchedulePanel;
     private BookTicketPanel bookTicketPanel;
 
-    private Clip backgroundMusic;
+    private Clip backgroundClip;
 
     public LondonMusicalTicketSystemGUI() {
         setTitle("London Musical Ticket System");
@@ -55,39 +54,22 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
         add(buttonPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
-        initializeBackgroundMusic();
+        // Initialize background music
+        initBackgroundMusic("music.wav");
 
         setupActionListeners();
     }
 
-    private void initializeBackgroundMusic() {
+    private void initBackgroundMusic(String musicFilePath) {
         try {
-            // Load the music file
-            File musicFile = new File("background_music.wav");
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+            File audioFile = new File(musicFilePath);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
 
-            // Get a Clip object to play the music
-            backgroundMusic = AudioSystem.getClip();
-            backgroundMusic.open(audioStream);
-
-            // Loop the music indefinitely
-            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            backgroundClip = AudioSystem.getClip();
+            backgroundClip.open(audioStream);
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void playBackgroundMusic() {
-        // Start playing the background music
-        if (backgroundMusic != null && !backgroundMusic.isRunning()) {
-            backgroundMusic.start();
-        }
-    }
-
-    private void stopBackgroundMusic() {
-        // Stop the background music
-        if (backgroundMusic != null && backgroundMusic.isRunning()) {
-            backgroundMusic.stop();
         }
     }
 
@@ -113,15 +95,20 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
         });
     }
 
+    private void playBackgroundMusic() {
+        if (backgroundClip != null && !backgroundClip.isRunning()) {
+            backgroundClip.start();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundClip != null && backgroundClip.isRunning()) {
+            backgroundClip.stop();
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                    | UnsupportedLookAndFeelException e) {
-                e.printStackTrace();
-            }
-
             LondonMusicalTicketSystemGUI gui = new LondonMusicalTicketSystemGUI();
             gui.setVisible(true);
         });
