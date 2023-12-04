@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ShowSchedulePanel extends JPanel {
+public class SchedulePanel extends JPanel {
     private JComboBox<String> dayOfWeekDropdown;
     private JComboBox<String> showDropdown;
     private JTable scheduleTable;
@@ -21,48 +21,40 @@ public class ShowSchedulePanel extends JPanel {
 
     private Map<String, ShowSchedule> showSchedules;
 
-    public ShowSchedulePanel() {
+    public SchedulePanel() {
         setLayout(new BorderLayout());
 
-        // Dropdown for selecting day of the week
         dayOfWeekDropdown = new JComboBox<>(
                 new String[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" });
 
-        // Dropdown for selecting show
         showDropdown = new JComboBox<>(new String[] { "The Lion King", "Wicked" });
         showSchedules = loadShowSchedules();
 
-        // Table for displaying show schedule
         String[] columnNames = { "Day of week", "Matinee", "Evening" };
-        Object[][] data = getSelectedShowSchedule(); // Initial data for the selected show
+        Object[][] data = getSelectedShowSchedule();
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make the cells non-editable
+                return false;
             }
         };
         scheduleTable = new JTable(tableModel);
-        scheduleTable.setPreferredScrollableViewportSize(new Dimension(300, 100)); // Adjust the table size
+        scheduleTable.setPreferredScrollableViewportSize(new Dimension(300, 100));
 
-        // Customize column appearance
-        scheduleTable.getColumnModel().getColumn(0).setPreferredWidth(100); // Day of week
-        scheduleTable.getColumnModel().getColumn(1).setPreferredWidth(100); // Matinee
-        scheduleTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Evening
+        scheduleTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        scheduleTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+        scheduleTable.getColumnModel().getColumn(2).setPreferredWidth(100);
 
-        // Increase the gap between rows
         scheduleTable.setRowHeight(30);
 
-        // Center-align the content in columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         scheduleTable.setDefaultRenderer(Object.class, centerRenderer);
 
-        // Button to update available seats (Replace this with actual logic)
         updateSeatsButton = new JButton("Update Available Seats");
         updateSeatsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Replace this with logic to fetch and update available seats
                 String selectedDayOfWeek = (String) dayOfWeekDropdown.getSelectedItem();
                 int selectedRow = getRowIndex(selectedDayOfWeek);
                 String selectedMatinee = (String) tableModel.getValueAt(selectedRow, 1);
@@ -72,10 +64,8 @@ public class ShowSchedulePanel extends JPanel {
             }
         });
 
-        // Label for displaying available seats
         availableSeatsLabel = new JLabel("Available Seats: ");
 
-        // Add components to the panel
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Select Day of Week:"));
         topPanel.add(dayOfWeekDropdown);
@@ -87,7 +77,6 @@ public class ShowSchedulePanel extends JPanel {
         add(new JScrollPane(scheduleTable), BorderLayout.CENTER);
         add(availableSeatsLabel, BorderLayout.SOUTH);
 
-        // Add listener for show dropdown changes
         showDropdown.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -97,11 +86,9 @@ public class ShowSchedulePanel extends JPanel {
     }
 
     private Map<String, ShowSchedule> loadShowSchedules() {
-        // Load show schedules from CSV file (replace with actual logic)
-        // For this example, we load schedules for two shows
         Map<String, ShowSchedule> schedules = new HashMap<>();
-        schedules.put("The Lion King", new ShowSchedule("The Lion King", "schedule.csv"));
-        schedules.put("Wicked", new ShowSchedule("Wicked", "schedule.csv"));
+        schedules.put("The Lion King", new ShowSchedule("The Lion King", "CSV/schedule.csv"));
+        schedules.put("Wicked", new ShowSchedule("Wicked", "CSV/schedule.csv"));
         return schedules;
     }
 
@@ -130,9 +117,6 @@ public class ShowSchedulePanel extends JPanel {
     }
 
     private String getAvailableSeats(String matinee, String evening) {
-        // Replace this with logic to fetch available seats based on the selected
-        // schedule
-        // For demonstration purposes, this returns a placeholder string
         return "100";
     }
 
@@ -188,7 +172,7 @@ public class ShowSchedulePanel extends JPanel {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 400);
 
-            ShowSchedulePanel showSchedulePanel = new ShowSchedulePanel();
+            SchedulePanel showSchedulePanel = new SchedulePanel();
             frame.add(showSchedulePanel);
 
             frame.setVisible(true);

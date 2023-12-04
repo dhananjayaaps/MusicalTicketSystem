@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,12 +8,12 @@ import java.util.List;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class MusicalInformationPanel extends JPanel {
+public class InformationPanel extends JPanel {
     private static DefaultListModel<Musical> musicalListModel;
     private JList<Musical> musicalList;
     private JTextField searchField;
 
-    public MusicalInformationPanel() {
+    public InformationPanel() {
         setLayout(new BorderLayout());
 
         musicalListModel = new DefaultListModel<>();
@@ -26,7 +24,6 @@ public class MusicalInformationPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
 
-        // Add search bar
         searchField = new JTextField();
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -41,13 +38,13 @@ public class MusicalInformationPanel extends JPanel {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                // Plain text components do not fire these events
+
             }
         });
 
         add(searchField, BorderLayout.NORTH);
 
-        populateMusicalsFromCSV("musicals.csv"); // Change the filename accordingly
+        readMusicalCsv("CSV/musicals.csv");
     }
 
     private void filterMusicals(String searchText) {
@@ -61,7 +58,7 @@ public class MusicalInformationPanel extends JPanel {
         musicalList.setModel(filteredModel);
     }
 
-    private void populateMusicalsFromCSV(String fileName) {
+    private void readMusicalCsv(String fileName) {
         try {
             Path path = Paths.get(fileName);
             List<String> lines = Files.readAllLines(path);
@@ -177,8 +174,8 @@ public class MusicalInformationPanel extends JPanel {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 400);
 
-            MusicalInformationPanel musicalInformationPanel = new MusicalInformationPanel();
-            frame.add(musicalInformationPanel);
+            InformationPanel informationPanel = new InformationPanel();
+            frame.add(informationPanel);
 
             frame.setVisible(true);
         });

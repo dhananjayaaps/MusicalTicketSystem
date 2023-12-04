@@ -1,11 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import javax.sound.sampled.*;
 
-public class LondonMusicalTicketSystemGUI extends JFrame {
+public class Main extends JFrame {
     private JPanel buttonPanel;
     private JButton musicalListButton;
     private JButton showScheduleButton;
@@ -15,13 +13,13 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
     private JPanel contentPanel;
     private CardLayout cardLayout;
 
-    private MusicalInformationPanel musicalInformationPanel;
-    private ShowSchedulePanel showSchedulePanel;
+    private InformationPanel informationPanel;
+    private SchedulePanel showSchedulePanel;
     private BookTicketPanel bookTicketPanel;
 
     private Clip backgroundClip;
 
-    public LondonMusicalTicketSystemGUI() {
+    public Main() {
         setTitle("London Musical Ticket System");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,10 +40,10 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        musicalInformationPanel = new MusicalInformationPanel();
-        contentPanel.add(musicalInformationPanel, "MusicalInformation");
+        informationPanel = new InformationPanel();
+        contentPanel.add(informationPanel, "MusicalInformation");
 
-        showSchedulePanel = new ShowSchedulePanel();
+        showSchedulePanel = new SchedulePanel();
         contentPanel.add(showSchedulePanel, "ShowSchedule");
 
         bookTicketPanel = new BookTicketPanel();
@@ -54,20 +52,19 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
         add(buttonPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Initialize background music
-        initBackgroundMusic("music.wav");
+        makeMusic("music.wav");
 
         setupActionListeners();
     }
 
-    private void initBackgroundMusic(String musicFilePath) {
+    private void makeMusic(String musicFilePath) {
         try {
             File audioFile = new File(musicFilePath);
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
 
             backgroundClip = AudioSystem.getClip();
             backgroundClip.open(audioStream);
-            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music continuously
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,7 +106,7 @@ public class LondonMusicalTicketSystemGUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            LondonMusicalTicketSystemGUI gui = new LondonMusicalTicketSystemGUI();
+            Main gui = new Main();
             gui.setVisible(true);
         });
     }

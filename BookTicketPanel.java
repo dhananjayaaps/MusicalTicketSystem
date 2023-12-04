@@ -41,7 +41,6 @@ public class BookTicketPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // Musical Selection
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(new JLabel("Musical:"), gbc);
@@ -51,11 +50,9 @@ public class BookTicketPanel extends JPanel {
         musicalComboBox = new JComboBox<>();
         add(musicalComboBox, gbc);
 
-        // Initialize musicals (loadMusicals method will be called initially)
         loadMusicals();
-        selectedMusical = musicalComboBox.getSelectedItem().toString(); // Initialize selectedMusical
+        selectedMusical = musicalComboBox.getSelectedItem().toString();
 
-        // Date Selection
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(new JLabel("Date:"), gbc);
@@ -65,7 +62,6 @@ public class BookTicketPanel extends JPanel {
         dateComboBox = new JComboBox<>();
         add(dateComboBox, gbc);
 
-        // Time Selection
         gbc.gridx = 0;
         gbc.gridy = 2;
         add(new JLabel("Time:"), gbc);
@@ -75,7 +71,6 @@ public class BookTicketPanel extends JPanel {
         timeComboBox = new JComboBox<>();
         add(timeComboBox, gbc);
 
-        // Number of Tickets
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
@@ -90,7 +85,6 @@ public class BookTicketPanel extends JPanel {
         editor.setPreferredSize(prefSize);
         add(numberOfTicketsSpinner, gbc);
 
-        // Ticket Type
         gbc.gridx = 0;
         gbc.gridy = 4;
         add(new JLabel("Ticket Type:"), gbc);
@@ -114,7 +108,6 @@ public class BookTicketPanel extends JPanel {
         gbc.gridy = 4;
         add(ticketTypePanel, gbc);
 
-        // Total Price
         gbc.gridx = 0;
         gbc.gridy = 5;
         add(new JLabel("Total Price:"), gbc);
@@ -141,33 +134,29 @@ public class BookTicketPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateTotalPrice();
-                saveBookingToCSV(); // Save the booking details to CSV
+                saveBookingToCSV();
             }
         });
 
-        // Load seat availability from CSV
-        loadSeatAvailabilityFromCSV();
+        SeatAvailLoad();
 
-        // Add listeners
         addListeners();
 
     }
 
     private void saveBookingToCSV() {
         try {
-            File file = new File("bookings.csv");
+            File file = new File("CSV/bookings.csv");
             boolean fileExists = file.exists();
 
-            FileWriter writer = new FileWriter(file, true); // Append mode
+            FileWriter writer = new FileWriter(file, true);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             PrintWriter printWriter = new PrintWriter(bufferedWriter);
 
-            // Write header if the file is empty
             if (!fileExists) {
                 printWriter.println("Musical,Time,Date,Venue,SeatRow,SeatColumn,TotalPrice,TicketType");
             }
 
-            // Get the selected ticket type
             String ticketType = "";
             if (adultRadio.isSelected()) {
                 ticketType = "Adult";
@@ -177,7 +166,6 @@ public class BookTicketPanel extends JPanel {
                 ticketType = "Student";
             }
 
-            // Write the booking details to the file
             for (int i = 0; i < seatButtons.length; i++) {
                 for (int j = 0; j < seatButtons[i].length; j++) {
                     if (seatButtons[i][j].isSelected()) {
@@ -198,7 +186,7 @@ public class BookTicketPanel extends JPanel {
 
     private void createSeatSelectionPanel(int rows, int columns) {
         JPanel seatPanel = new JPanel(new GridLayout(rows, columns, 5, 5));
-        seatPanel.setName("seatPanel"); // Set a name for easy identification and removal
+        seatPanel.setName("seatPanel");
         seatButtons = new JToggleButton[rows][columns];
 
         for (int i = 0; i < rows; i++) {
@@ -221,7 +209,7 @@ public class BookTicketPanel extends JPanel {
 
     private void loadMusicals() {
         musicals = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("seat_availability.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CSV/seat_availability.csv"))) {
             String header = reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -251,7 +239,7 @@ public class BookTicketPanel extends JPanel {
 
     private void loadDatesAndSeats() {
         dates = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("seat_availability.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CSV/seat_availability.csv"))) {
             String header = reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -264,12 +252,10 @@ public class BookTicketPanel extends JPanel {
             }
             dateComboBox.setModel(new DefaultComboBoxModel<>(dates.toArray(new String[0])));
 
-            // Remove existing seat panel and create a new one
             removeSeatPanel();
             createSeatSelectionPanel(3, 3);
 
-            // Load seat availability based on the selected musical, date, and time
-            loadSeatAvailabilityFromCSV();
+            SeatAvailLoad();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -277,7 +263,7 @@ public class BookTicketPanel extends JPanel {
 
     private void loadDates() {
         dates = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("seat_availability.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CSV/seat_availability.csv"))) {
             String header = reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -296,7 +282,7 @@ public class BookTicketPanel extends JPanel {
 
     private void loadTimes() {
         times = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("seat_availability.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CSV/seat_availability.csv"))) {
             String header = reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
@@ -314,9 +300,8 @@ public class BookTicketPanel extends JPanel {
         }
     }
 
-    private void loadSeatAvailabilityFromCSV() {
-        // Load seat availability from CSV and update seat panel
-        try (BufferedReader reader = new BufferedReader(new FileReader("seat_availability.csv"))) {
+    private void SeatAvailLoad() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("CSV/seat_availability.csv"))) {
             String header = reader.readLine();
 
             String line;
@@ -351,7 +336,6 @@ public class BookTicketPanel extends JPanel {
         double basePrice = 10.0;
         int numberOfTickets = 0;
 
-        // Validate and adjust the number of tickets
         try {
             int tempNumberOfTickets = Integer.parseInt(numberOfTicketsSpinner.getValue().toString());
             numberOfTickets = Math.max(tempNumberOfTickets, 0);
@@ -410,7 +394,7 @@ public class BookTicketPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (timeComboBox.getSelectedItem() != null) {
                     selectedTime = timeComboBox.getSelectedItem().toString();
-                    loadDatesAndSeats(); // Load dates and update seats based on the selected time
+                    loadDatesAndSeats();
                 }
             }
         });
@@ -426,7 +410,7 @@ public class BookTicketPanel extends JPanel {
                 dateComboBox.setModel(new DefaultComboBoxModel<>(new String[] { null }));
                 timeComboBox.setModel(new DefaultComboBoxModel<>(new String[] { null }));
 
-                loadDatesAndSeats(); // Load dates and update seats based on the selected musical
+                loadDatesAndSeats();
             }
         });
 
@@ -439,12 +423,10 @@ public class BookTicketPanel extends JPanel {
 
                 loadTimes();
 
-                // Remove existing seat panel and create a new one
                 removeSeatPanel();
                 createSeatSelectionPanel(3, 3);
 
-                // Load seat availability based on the selected musical, date, and time
-                loadSeatAvailabilityFromCSV();
+                SeatAvailLoad();
 
             }
         });
@@ -456,8 +438,8 @@ public class BookTicketPanel extends JPanel {
                     selectedTime = timeComboBox.getSelectedItem().toString();
 
                     removeSeatPanel();
-                    createSeatSelectionPanel(3, 3); // Create the seat selection panel first
-                    loadSeatAvailabilityFromCSV(); // Then load seat availability
+                    createSeatSelectionPanel(3, 3);
+                    SeatAvailLoad();
                 }
 
             }
